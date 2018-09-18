@@ -45,13 +45,12 @@ def message(client, userdata, msg):
 
         wort = slots['wort']
         answer = wort + ' buchstabiert sich '
+        mqtt_client.publish('hermes/dialogueManager/endSession',
+                        json.dumps({"sessionId": session_id}))
         ttssay(siteId, answer)
         for buchstabe in wort:
             ttssay(siteId, buchstabe)
             time.sleep(1)
-            
-        mqtt_client.publish('hermes/dialogueManager/endSession',
-                        json.dumps({"sessionId": session_id}))
     except KeyError:
         pass
 
