@@ -44,7 +44,7 @@ def message(client, userdata, msg):
         user, intentname = data['intent']['intentName'].split(':')
 
         wort = slots['wort']
-        answer = wort + ' ist buchstabiert '
+        answer = wort + ' buchstabiert sich '
         for buchstabe in wort:
             answer += buchstabe + '. '
         say(session_id, answer)
