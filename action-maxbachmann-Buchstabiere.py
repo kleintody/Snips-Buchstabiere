@@ -56,7 +56,7 @@ def message(client, userdata, msg):
 
 def ttssay(siteId, text):
     mqtt_client.publish('hermes/tts/say',
-                        json.dumps({'text': text, "siteId": siteId, "lang": "de"}))
+                        json.dumps({'text': text, "siteId": siteId}))
 
 
 
