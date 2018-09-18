@@ -45,7 +45,7 @@ def message(client, userdata, msg):
         wort = slots['wort']
         answer = wort + ' buchstabiert sich '
         for buchstabe in wort:
-            answer += buchstabe + '<break time="1000ms"/>'
+            answer += buchstabe + ' <break time="1000ms"/> '
         say(session_id, answer)
     except KeyError:
         pass
