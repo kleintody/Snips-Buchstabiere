@@ -5,7 +5,7 @@
 import ConfigParser
 import io
 import paho.mqtt.client as mqtt
-import time
+import random
 import json
 
 CONFIGURATION_ENCODING_FORMAT = "utf-8"
@@ -38,25 +38,22 @@ def on_connect(client, userdata, flags, rc):
 
 def message(client, userdata, msg):
     data = json.loads(msg.payload.decode("utf-8"))
-    siteId = data['siteId']
     session_id = data['sessionId']
     try:
         slots = {slot['slotName']: slot['value']['value'] for slot in data['slots']}
+        user, intentname = data['intent']['intentName'].split(':')
 
         wort = slots['wort']
         answer = wort + ' buchstabiert sich '
-        mqtt_client.publish('hermes/dialogueManager/endSession',
-                        json.dumps({"sessionId": session_id}))
-        ttssay(siteId, answer)
         for buchstabe in wort:
-            ttssay(siteId, buchstabe)
-            time.sleep(1)
+            answer += buchstabe + '                   '
+        say(session_id, answer)
     except KeyError:
         pass
 
-def ttssay(siteId, text):
-    mqtt_client.publish('hermes/tts/say',
-                        json.dumps({'text': text, "siteId": siteId}))
+def say(session_id, text):
+    mqtt_client.publish('hermes/dialogueManager/endSession',
+                        json.dumps({'text': text, "sessionId": session_id}))
 
 
 
