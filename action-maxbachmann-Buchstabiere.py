@@ -41,12 +41,11 @@ def message(client, userdata, msg):
     session_id = data['sessionId']
     try:
         slots = {slot['slotName']: slot['value']['value'] for slot in data['slots']}
-        user, intentname = data['intent']['intentName'].split(':')
 
         wort = slots['wort']
         answer = wort + ' buchstabiert sich '
         for buchstabe in wort:
-            answer += buchstabe + '                   '
+            answer += buchstabe + '<break time="5000ms"/>'
         say(session_id, answer)
     except KeyError:
         pass
