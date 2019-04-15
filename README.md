@@ -1,3 +1,3 @@
-# Snips-MagicMirror2
+# Snips-Buchstabiere
 
-Skill to Show, Hide and Move Modules on the MagicMirror2.
+Lasse Snips Wörter von der Duden Liste der rechtschreiblich schweren Wörter buchstabieren. (https://www.duden.de/Liste-der-rechtschreiblich-schwierigen-Woerter ).
