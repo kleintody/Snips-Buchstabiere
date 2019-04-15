@@ -1,41 +1,3 @@
-#!/usr/bin/env python2
-# -*- coding: utf-8 -*-
-
-
-import ConfigParser
-import io
-import paho.mqtt.client as mqtt
-import random
-import json
-
-CONFIGURATION_ENCODING_FORMAT = "utf-8"
-CONFIG_INI = "config.ini"
-
-class SnipsConfigParser(ConfigParser.SafeConfigParser):
-    def to_dict(self):
-        return {section: {option_name: option for option_name, option in self.items(section)} for section in self.sections()}
-
-
-def read_configuration_file(configuration_file):
-    try:
-        with io.open(configuration_file, encoding=CONFIGURATION_ENCODING_FORMAT) as f:
-            conf_parser = SnipsConfigParser()
-            conf_parser.readfp(f)
-            return conf_parser.to_dict()
-    except (IOError, ConfigParser.Error) as e:
-        return dict()
-
-
-conf = read_configuration_file(CONFIG_INI)
-print("Conf:", conf)
-
-# MQTT client to connect to the bus
-mqtt_client = mqtt.Client()
-
-def on_connect(client, userdata, flags, rc):
-    client.subscribe("hermes/intent/#")
-
-
 def message(client, userdata, msg):
     data = json.loads(msg.payload.decode("utf-8"))
     session_id = data['sessionId']
@@ -53,12 +15,45 @@ def message(client, userdata, msg):
 def say(session_id, text):
     mqtt_client.publish('hermes/dialogueManager/endSession',
                         json.dumps({'text': text, "sessionId": session_id}))
+    
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+import configparser
+from hermes_python.hermes import Hermes
+from hermes_python.ffi.utils import MqttOptions
+from hermes_python.ontology import *
+import io
+
+CONFIGURATION_ENCODING_FORMAT = "utf-8"
+CONFIG_INI = "config.ini"
+
+class SnipsConfigParser(configparser.SafeConfigParser):
+    def to_dict(self):
+        return {section : {option_name : option for option_name, option in self.items(section)} for section in self.sections()}
 
 
+def read_configuration_file(configuration_file):
+    try:
+        with io.open(configuration_file, encoding=CONFIGURATION_ENCODING_FORMAT) as f:
+            conf_parser = SnipsConfigParser()
+            conf_parser.readfp(f)
+            return conf_parser.to_dict()
+    except (IOError, configparser.Error) as e:
+        return dict()
+
+def subscribe_intent_callback(hermes, intentMessage):
+    conf = read_configuration_file(CONFIG_INI)
+    action_wrapper(hermes, intentMessage, conf)
+
+
+def action_wrapper(hermes, intentMessage, conf):
+    {{#each action_code as |a|}}{{a}}
+    {{/each}}
 
 
 if __name__ == "__main__":
-    mqtt_client.on_connect = on_connect
-    mqtt_client.message_callback_add("hermes/intent/maxbachmann:buchstabiere/#", message)
-    mqtt_client.connect("localhost", "1883")
-    mqtt_client.loop_forever()
+    mqtt_opts = MqttOptions()
+    with Hermes(mqtt_options=mqtt_opts) as h:
+        h.subscribe_intent("buchstabiere", subscribe_intent_callback) \
+         .start()
