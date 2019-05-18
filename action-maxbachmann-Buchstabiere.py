@@ -43,9 +43,10 @@ def message(client, userdata, msg):
         slots = {slot['slotName']: slot['value']['value'] for slot in data['slots']}
 
         wort = slots['wort']
-        answer = wort + ' buchstabiert sich '
+        answer = '<speak>' + wort + ' buchstabiert sich '
         for buchstabe in wort:
             answer += buchstabe + ' <break time="500ms"/> '
+        answer += '</speak>'
         say(session_id, answer)
     except KeyError:
         pass
