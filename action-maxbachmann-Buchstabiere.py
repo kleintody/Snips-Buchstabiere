@@ -42,11 +42,10 @@ def message(client, userdata, msg):
     try:
         slots = {slot['slotName']: slot['value']['value'] for slot in data['slots']}
 
-        wort = slots['wort']
-        answer = '<speak>' + wort + ' buchstabiert sich '
-        for buchstabe in wort:
-            answer += buchstabe + ' <break time="500ms"/> '
-        answer += '</speak>'
+        answer = '<speak>' + slots['wort'] + ' buchstabiert sich '
+        for buchstabe in slots['wort'][:-1]:
+            answer += buchstabe + ' <break time="300ms"/> '
+        answer += slots['wort'][-1] + '</speak>'
         say(session_id, answer)
     except KeyError:
         pass
@@ -54,8 +53,6 @@ def message(client, userdata, msg):
 def say(session_id, text):
     mqtt_client.publish('hermes/dialogueManager/endSession',
                         json.dumps({'text': text, "sessionId": session_id}))
-
-
 
 
 if __name__ == "__main__":
