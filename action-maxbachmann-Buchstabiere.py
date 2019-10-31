@@ -1,8 +1,7 @@
-#!/usr/bin/env python2
-# -*- coding: utf-8 -*-
+#!/usr/bin/env python3
 
 
-import ConfigParser
+import configparser
 import io
 import paho.mqtt.client as mqtt
 import random
@@ -11,7 +10,7 @@ import json
 CONFIGURATION_ENCODING_FORMAT = "utf-8"
 CONFIG_INI = "config.ini"
 
-class SnipsConfigParser(ConfigParser.SafeConfigParser):
+class SnipsConfigParser(configparser.SafeConfigParser):
     def to_dict(self):
         return {section: {option_name: option for option_name, option in self.items(section)} for section in self.sections()}
 
@@ -22,12 +21,12 @@ def read_configuration_file(configuration_file):
             conf_parser = SnipsConfigParser()
             conf_parser.readfp(f)
             return conf_parser.to_dict()
-    except (IOError, ConfigParser.Error) as e:
+    except (OSError, configparser.Error):
         return dict()
 
 
 conf = read_configuration_file(CONFIG_INI)
-print("Conf:", conf)
+print(("Conf:", conf))
 
 # MQTT client to connect to the bus
 mqtt_client = mqtt.Client()
