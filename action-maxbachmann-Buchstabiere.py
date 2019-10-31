@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 
 import configparser
@@ -11,7 +10,7 @@ import json
 CONFIGURATION_ENCODING_FORMAT = "utf-8"
 CONFIG_INI = "config.ini"
 
-class SnipsConfigParser(configparser.SafeConfigParser):
+class SnipsConfigParser(configparser.ConfigParser):
     def to_dict(self):
         return {section: {option_name: option for option_name, option in self.items(section)} for section in self.sections()}
 
@@ -20,14 +19,14 @@ def read_configuration_file(configuration_file):
     try:
         with io.open(configuration_file, encoding=CONFIGURATION_ENCODING_FORMAT) as f:
             conf_parser = SnipsConfigParser()
-            conf_parser.readfp(f)
+            conf_parser.read_file(f)
             return conf_parser.to_dict()
-    except (IOError, configparser.Error) as e:
+    except (OSError, configparser.Error):
         return dict()
 
 
 conf = read_configuration_file(CONFIG_INI)
-print("Conf:", conf)
+print(("Conf:", conf))
 
 # MQTT client to connect to the bus
 mqtt_client = mqtt.Client()
@@ -42,10 +41,7 @@ def message(client, userdata, msg):
     try:
         slots = {slot['slotName']: slot['value']['value'] for slot in data['slots']}
 
-        answer = '<speak>' + slots['wort'] + ' buchstabiert sich '
-        for buchstabe in slots['wort'][:-1]:
-            answer += buchstabe + ' <break time="300ms"/> '
-        answer += slots['wort'][-1] + '</speak>'
+        answer = '{} buchstabiert sich {}'.format(slots['wort'], '<break time="300ms"/>'.join(slots['wort']))
         say(session_id, answer)
     except KeyError:
         pass
